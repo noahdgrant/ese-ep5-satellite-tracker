@@ -2,6 +2,6 @@
 
 # Limit switch code for EP5 satellite Tracker
 
-class Limitswtich():
+class Limit_Switch():
     def __init__(self):
-        ...
+        self.limit = False
