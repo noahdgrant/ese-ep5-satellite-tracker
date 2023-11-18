@@ -4,57 +4,36 @@
 
 from stepper import Stepper
 from magnetometer import Magnetometer
-from limit_switch import Limit_Switch
+from smbus2 import SMBus
+
+I2C_ADDRESS_STEPPER_ALT = 14
 
 STEPPER_DEG_PER_FULL_STEP = 1.8
+STEPPER_DEG_PER_32_STEP = STEPPER_DEG_PER_FULL_STEP / 32
 
 
 class Antenna():
     def __init__(self):
-        self.stepper_alt = Stepper()
+        self.bus = SMBus(1)
+
+        self.stepper_alt = Stepper(self.bus, I2C_ADDRESS_STEPPER_ALT)
         self.stepper_azi = Stepper()
         self.magnetometer = Magnetometer()
-        self.limit_switch_noth = Limit_Switch()
-        self.limit_switch_south = Limit_Switch()
 
         self.magnetometer_max = 0
         self.stepper_alt_count = 0
+
+        self.stepper_alt.init_limit_switch_forward()
+        self.stepper_alt.init_limit_switch_reverse()
 
     def alt_home(self):
-        # Tilt to North face
-        while self.limit_switch_north.limit is False:
-            self.stepper_alt.step("Full", False)
-
-        self.stepper_alt_count = 0
-
-        # Tilt to South Face
-        while self.limit_switch_south.limit is False:
-            self.stepper_alt.step("Full", True)
-            self.stepper_alt_count += 1
-
-        # Point straight up
-        for _ in range(self.stepper_alt_count / 2):
-            self.stepper_alt.step("Full", False)
-
-        self.stepper_alt_count /= 2
+        self.stepper_alt.go_home_forward()
 
     def alt_set_angle(self, angle):
-        ...
+        self.stepper_alt.set_target_position(-angle / STEPPER_DEG_PER_32_STEP)
 
     def azi_home(self):
-        self.magnetometer_max = 0
-
-        # Find North
-        for _ in range(360/STEPPER_DEG_PER_FULL_STEP):
-            self.stepper_azi.step("Full", False)
-            magnetometer_reading = self.magnetometer.read()
-
-            if magnetometer_reading > self.magnetometer_max:
-                self.magnetometer_max = magnetometer_reading
-
-        # Point North
-        while self.magnetometer.read() < (self.magnetometer_max - 5):
-            self.stepper_azi.step("Full", False)
+        ...
 
     def azi_set_angle(self, angle):
         ...
@@ -62,3 +41,8 @@ class Antenna():
     def home(self):
         self.azi_home()
         self.alt_home()
+
+    def shutdown(self):
+        self.stepper_alt.go_home_forward()
+        self.stepper_alt.de_energize()
+        self.stepper_azi.de_energize()
