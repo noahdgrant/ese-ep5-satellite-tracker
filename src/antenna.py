@@ -2,8 +2,8 @@
 
 # Antenna class for satellite tracker
 
-from stepper import Stepper
-# from magnetometer import Magnetometer
+from .stepper import Stepper
+# from .magnetometer import Magnetometer
 from smbus2 import SMBus
 
 I2C_ADDRESS_STEPPER_ALT = 14
