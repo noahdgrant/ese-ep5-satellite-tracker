@@ -1,11 +1,16 @@
 import sys
 sys.path.append("..")
 
-from encoder import Encoder
-import time
+from src.encoder import Encoder
+from time import sleep
+from smbus2 import SMBus
 
 def main():
-    encoder = Encoder()
+    # Initialize encoder
+    bus = SMBus(11)
+    i2c_address = 0x36
+
+    encoder = Encoder(bus, i2c_address)
 
     # Calibration
     input("Place the sensor in a known orientation (e.g., zero degree position) and press Enter to calibrate.")
@@ -19,10 +24,10 @@ def main():
             if angle is not None:
                 print(f"Adjusted Angle: {angle:.2f} degrees")
 
-            time.sleep(1)
+            sleep(1)
 
     except KeyboardInterrupt:
-        print("Script terminated by user.")
+        print("Script terminated by the user.")
 
 if __name__ == "__main__":
     main()

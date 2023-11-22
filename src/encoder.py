@@ -1,12 +1,12 @@
-import smbus2 as smbus
+from smbus2 import SMBus
 import time
 
 class Encoder:
-    def __init__(self, address=0x36, bus_number=1):
-        self.AS5600_ADDRESS = address
+    def __init__(self, bus, i2c_address):
+        self.AS5600_ADDRESS = i2c_address
         self.ANGLE_REGISTER_HIGH = 0x0E
         self.ANGLE_REGISTER_LOW = 0x0F
-        self.bus = smbus.SMBus(bus_number)
+        self.bus = bus
         self.zero_deg_raw_value = None
 
     def read_angle(self):
