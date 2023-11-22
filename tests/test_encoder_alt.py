@@ -6,7 +6,7 @@ from time import sleep
 from smbus2 import SMBus
 
 def main():
-    # Initialize encoder
+    # Initialize encoder test
     bus = SMBus(11)
     i2c_address = 0x36
 
