@@ -38,13 +38,11 @@ class Stepper:
         command = [0x97, 0x01]
         write = i2c_msg.write(self.i2c_address, command)
         self.bus.i2c_rdwr(write)
-        self.current_pos = self.get_current_position()
 
     def go_home_reverse(self):
         command = [0x97, 0x00]
         write = i2c_msg.write(self.i2c_address, command)
         self.bus.i2c_rdwr(write)
-        self.current_pos = self.get_current_position()
 
     def get_variable(self, offset, length):
         write = i2c_msg.write(self.i2c_address, [0xA1, offset])
@@ -58,17 +56,14 @@ class Stepper:
                             (data[3] << 24))
         if self.current_pos >= (1 << 31):
             self.current_pos -= (1 << 32)
-        return self.current_pos()
+        return self.current_pos
 
     def init_limit_switch_forward(self):
         # TX pin
-        command = [0x3D, 0x08]
-        write = i2c_msg.write(self.i2c_address, command)
-        self.bus.i2c_rdwr(write)
-
-        command = [0x5F, 0x04]
-        write = i2c_msg.write(self.i2c_address, command)
-        self.bus.i2c_rdwr(write)
+        self.bus.write_byte_data(self.i2c_address, 0x3D, 0x08)        
+#        command = [0x3D, 0x08]
+#        write = i2c_msg.write(self.i2c_address, command)
+#        self.bus.i2c_rdwr(write)
 
     def init_limit_switch_reverse(self):
         # RX pin
