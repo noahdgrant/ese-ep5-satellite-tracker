@@ -1,4 +1,5 @@
 ephem
 geocoder
 requests
+smbus2
 RPi.GPIO

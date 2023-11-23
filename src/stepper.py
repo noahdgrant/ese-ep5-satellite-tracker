@@ -1,39 +1,91 @@
-#!/bin/python3
-
-# Tile: Stepper motor control
+# Tile: Stepper motor class for satellite tracker
 # Author: Noah Grant
 # Date: November 10, 2023
 
-import RPi.GPIO as GPIO
-from RpiMotorLib import RpiMotorLib
+# This code is adapated from: https://www.pololu.com/docs/0J71/12.9
 
-NUM_GEARS = 36
-NUM_DEG_PER_STEP = 360 / NUM_GEARS
+from smbus2 import i2c_msg
 
 
-class Stepper():
-    def __init__(self, pin_dir, pin_step, pin_en):
-        self.motor = RpiMotorLib.A4988Nema(pin_dir, pin_step, (-1, -1, -1),
-                                           "DRV8825")
+class Stepper:
+    def __init__(self, bus, i2c_address):
+        self.bus = bus
+        self.i2c_address = i2c_address
 
-        self.step_count = 0
-        self.angle_old = 0
-        self.angle_cur = 0
+        self.current_position = 0
+        self.max_angle = 360
+        self.min_angle = 0
+        self.max_position = 0
+        self.home_position = 0
 
-    def home_alt(self):
-        self.angle_old = 0
-        self.angle_cur = 0
+        self.exit_safe_start()
+        self.energize()
 
-    def home_azi(self):
-        ...
+    def energize(self):
+        command = [0x85]
+        write = i2c_msg.write(self.i2c_address, command)
+        self.bus.i2c_rdwr(write)
 
-    def set_angle(self, angle):
-        # Calculate steps for new angle
-        self.angle_old = self.angle_cur
-        self.angle_cur = angle
+    def exit_safe_start(self):
+        command = [0x83]
+        write = i2c_msg.write(self.i2c_address, command)
+        self.bus.i2c_rdwr(write)
 
-        num_steps = int((self.angle_cur - self.angle_old) / NUM_DEG_PER_STEP)
-        self.step_count += num_steps
+    def de_energize(self):
+        command = [0x86]
+        write = i2c_msg.write(self.i2c_address, command)
+        self.bus.i2c_rdwr(write)
 
-        # Output new angle
-        ...
+    def go_home_forward(self):
+        command = [0x97, 0x01]
+        write = i2c_msg.write(self.i2c_address, command)
+        self.bus.i2c_rdwr(write)
+
+    def go_home_reverse(self):
+        command = [0x97, 0x00]
+        write = i2c_msg.write(self.i2c_address, command)
+        self.bus.i2c_rdwr(write)
+
+    def get_variable(self, offset, length):
+        write = i2c_msg.write(self.i2c_address, [0xA1, offset])
+        read = i2c_msg.read(self.i2c_address, length)
+        self.bus.i2c_rdwr(write, read)
+        return list(read)
+
+    def get_current_position(self):
+        data = self.get_variable(0x22, 4)
+        self.current_position = (data[0] + (data[1] << 8) + (data[2] << 16) +
+                                 (data[3] << 24))
+        if self.current_position >= (1 << 31):
+            self.current_position -= (1 << 32)
+        return self.current_position
+
+    def init_limit_switch_forward(self):
+        # TX pin
+        self.bus.write_byte_data(self.i2c_address, 0x3D, 0x08)
+
+    def init_limit_switch_reverse(self):
+        # RX pin
+        self.bus.write_byte_data(self.i2c_address, 0x3E, 0x09)
+
+    def set_target_angle(self, angle):
+        self.set_target_position(int(angle /
+                                 (self.max_angle / self.max_position)))
+
+    def set_target_position(self, target):
+        command = [0xE0,
+                   target >> 0 & 0xFF,
+                   target >> 8 & 0xFF,
+                   target >> 16 & 0xFF,
+                   target >> 24 & 0xFF]
+        write = i2c_msg.write(self.i2c_address, command)
+        self.bus.i2c_rdwr(write)
+
+    def set_target_velocity(self, target):
+        command = [0xE3,
+                   target >> 0 & 0xFF,
+                   target >> 8 & 0xFF,
+                   target >> 16 & 0xFF,
+                   target >> 24 & 0xFF]
+        write = i2c_msg.write(self.i2c_address, command)
+        self.bus.i2c_rdwr(write)
