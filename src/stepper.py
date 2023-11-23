@@ -9,15 +9,18 @@ from smbus2 import i2c_msg
 
 class Stepper:
     def __init__(self, bus, i2c_address):
+        self.current_position = 0
+
+        # I2C initialization
         self.bus = bus
         self.i2c_address = i2c_address
 
-        self.current_position = 0
-        self.max_angle = 360
-        self.min_angle = 0
-        self.max_position = 0
-        self.home_position = 0
+        # TIC T834 memory offsets and bit numbers
+        self.MISC_FLAGS = 0x01
+        self.HOMING_ACTIVE = 0x10
+        self.REVERSE_LIMIT_SWITCH = 0x08
 
+        # Start stepper
         self.exit_safe_start()
         self.energize()
 
@@ -67,10 +70,6 @@ class Stepper:
     def init_limit_switch_reverse(self):
         # RX pin
         self.bus.write_byte_data(self.i2c_address, 0x3E, 0x09)
-
-    def set_target_angle(self, angle):
-        self.set_target_position(int(angle /
-                                 (self.max_angle / self.max_position)))
 
     def set_target_position(self, target):
         command = [0xE0,
