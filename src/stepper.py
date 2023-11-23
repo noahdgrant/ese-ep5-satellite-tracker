@@ -1,6 +1,4 @@
-#!/bin/python3
-
-# Tile: Stepper motor control
+# Tile: Stepper motor class for satellite tracker
 # Author: Noah Grant
 # Date: November 10, 2023
 
@@ -14,7 +12,11 @@ class Stepper:
         self.bus = bus
         self.i2c_address = i2c_address
 
-        self.current_pos = 0
+        self.current_position = 0
+        self.max_angle = 360
+        self.min_angle = 0
+        self.max_position = 0
+        self.home_position = 0
 
         self.exit_safe_start()
         self.energize()
@@ -52,28 +54,23 @@ class Stepper:
 
     def get_current_position(self):
         data = self.get_variable(0x22, 4)
-        self.current_pos = (data[0] + (data[1] << 8) + (data[2] << 16) +
-                            (data[3] << 24))
-        if self.current_pos >= (1 << 31):
-            self.current_pos -= (1 << 32)
-        return self.current_pos
+        self.current_position = (data[0] + (data[1] << 8) + (data[2] << 16) +
+                                 (data[3] << 24))
+        if self.current_position >= (1 << 31):
+            self.current_position -= (1 << 32)
+        return self.current_position
 
     def init_limit_switch_forward(self):
         # TX pin
-        self.bus.write_byte_data(self.i2c_address, 0x3D, 0x08)        
-#        command = [0x3D, 0x08]
-#        write = i2c_msg.write(self.i2c_address, command)
-#        self.bus.i2c_rdwr(write)
+        self.bus.write_byte_data(self.i2c_address, 0x3D, 0x08)
 
     def init_limit_switch_reverse(self):
         # RX pin
-        command = [0x3E, 0x09]
-        write = i2c_msg.write(self.i2c_address, command)
-        self.bus.i2c_rdwr(write)
+        self.bus.write_byte_data(self.i2c_address, 0x3E, 0x09)
 
-        command = [0x60, 0x06]
-        write = i2c_msg.write(self.i2c_address, command)
-        self.bus.i2c_rdwr(write)
+    def set_target_angle(self, angle):
+        self.set_target_position(int(angle /
+                                 (self.max_angle / self.max_position)))
 
     def set_target_position(self, target):
         command = [0xE0,

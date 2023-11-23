@@ -2,36 +2,31 @@
 
 # Testing mainline for Antenna class
 
+import sys
+sys.path.append("..")
+
 from src.antenna import Antenna
+from time import sleep
 
 
 def main():
-    antenna = Antenna()
+    try:
+        antenna = Antenna()
 
-    # Test homing altitude
-    # Expected result: antenna points straight up
-    antenna.home()
+        # Test homing antenna
+        antenna.go_home()
 
-    # Test setting angles
-    # Expected result: antenna points 45 deg towards North
-    antenna.alt_set_angle(45)
+        # Test setting angles
+        angles = [0, -45, -90, -135, -180]
+        for angle in angles:
+            sleep(5)
+            antenna.set_alt_angle(angle)
 
-    # Expected result: antenna points 180 deg towards North
-    antenna.alt_set_angle(180)
+        # Test shutdown sequence
+        antenna.shutdown()
 
-    # Expected result: antenna points straight up
-    antenna.alt_set_angle(0)
-
-    # Expected result: antenna points 45 deg towards South
-    antenna.alt_set_angle(-45)
-
-    # Expected result: antenna points 180 deg towards South
-    antenna.alt_set_angle(-180)
-
-    # Test shutdown sequence
-    # Expected result: antenna altitude stepper returns to home position
-    # (180 deg) and de-energizes
-    antenna.shutdown()
+    except KeyboardInterrupt:
+        antenna.shutdown()
 
 
 if __name__ == "__main__":
