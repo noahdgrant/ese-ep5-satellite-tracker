@@ -1,5 +1,5 @@
 # Tile: Magnetometer class for satellite tracker
-# Author: Noah Grant
+# Author: Brendan
 # Date: November 23, 2023
 
 from math import atan2, degrees
@@ -8,9 +8,10 @@ import adafruit_lis3mdl
 
 
 class Magnetometer():
-    def __init__(self):
-        i2c = board.I2C()
-        self.sensor = adafruit_lis3mdl.LIS3MDL(i2c)
+    def __init__(self, bus, i2c_address):
+        self.bus = bus
+        self.i2c_address = i2c_address
+        self.sensor = adafruit_lis3mdl.LIS3MDL(self.bus, self.i2c_address)
 
     def vector_2_degrees(self, x, y):
         angle = degrees(atan2(y, x))

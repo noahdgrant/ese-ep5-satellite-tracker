@@ -6,17 +6,22 @@ import sys
 sys.path.append("..")
 
 from time import sleep
+import board
 from src.magnetometer import Magnetometer
+from smbus2 import SMBus
+import busio
 
 
 def main():
     try:
-        magnetometer = Magnetometer()
+        bus = board.I2C()
+        i2c_address = 0x1E
+        magnetometer = Magnetometer(bus, i2c_address)
 
         print("Displaying readings from magnetometer")
         while True:
             reading = magnetometer.get_heading()
-            print("Heading: {:.f} degrees".format(reading))
+            print(reading)
             sleep(1)
 
     except KeyboardInterrupt:

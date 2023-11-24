@@ -46,9 +46,9 @@ def main():
         angles = [-45, -90, -135, -180]
         for angle in angles:
             stepper.set_target_position(int(angle /
-                                            (max_angle / max_position)))
+                                            (max_angle / abs(max_position))))
             sleep(5)
-            print("Current position: %s", stepper.get_current_position())
+            print("Current position: ", stepper.get_current_position())
 
         # Shutdown stepper
         stepper.go_home_forward()
