@@ -29,8 +29,8 @@ def main():
         magnetometer = Magnetometer(busm, i2c_address)
 
         # Calibration
-        encoder.calibrate_zero_degree()
-        angle = encoder.get_adjusted_angle()
+        #encoder.calibrate_zero_degree()
+        #angle = encoder.get_adjusted_angle()
         print("Encoder angle: %d", angle)
 
         print("Displaying readings from magnetometer")
@@ -55,3 +55,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
