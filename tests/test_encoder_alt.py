@@ -5,6 +5,7 @@ from src.encoder import Encoder
 from time import sleep
 from smbus2 import SMBus
 
+
 def main():
     # Initialize encoder
     bus = SMBus(11)
@@ -28,6 +29,7 @@ def main():
 
     except KeyboardInterrupt:
         print("Script terminated by the user.")
+
 
 if __name__ == "__main__":
     main()
