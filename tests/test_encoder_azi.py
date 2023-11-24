@@ -31,7 +31,7 @@ def main():
         stepper.set_target_velocity(3200000)
         while True:
             angle = encoder.get_adjusted_angle()
-            if angle < 360:
+            if 357 < angle < 360:
                 print("Encoder angle: %d", angle)
             else:
                 break
