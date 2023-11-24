@@ -5,21 +5,18 @@
 import sys
 sys.path.append("..")
 
-from smbus2 import SMBus
 from time import sleep
 from src.magnetometer import Magnetometer
 
 
 def main():
     try:
-        bus = SMBus(11)
-        i2c_address = 0x1E
-        magnetometer = Magnetometer(bus, i2c_address)
+        magnetometer = Magnetometer()
 
         print("Displaying readings from magnetometer")
         while True:
-            reading = magnetometer.get_reading()
-            print(reading)
+            reading = magnetometer.get_heading()
+            print("Heading: {:.f} degrees".format(reading))
             sleep(1)
 
     except KeyboardInterrupt:
