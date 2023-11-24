@@ -74,7 +74,7 @@ class Antenna():
         self.stepper_azi.set_target_velocity(100000000)
         while self.magnetometer.get_heading() > 1:
             pass
-        self.stepper_azi.set_target_velocity(0)
+        self.stepper_azi.stop()
 
         # Count number of steps in a full rotation
         self.azi_position_min = self.stepper_azi.get_current_position()
@@ -82,7 +82,7 @@ class Antenna():
         self.stepper_azi.set_target_velocity(100000000)
         while 0 < self.encoder_azi.get_adjusted_angle() < 359.9:
             pass
-        self.stepper_azi.set_target_velocity(0)
+        self.stepper_azi.stop()
         self.azi_position_max = self.stepper_azi.get_current_position()
         self.azi_total_steps = abs(
                 self.azi_position_max - self.azi_position_min)

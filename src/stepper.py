@@ -63,6 +63,15 @@ class Stepper:
             self.current_position -= (1 << 32)
         return self.current_position
 
+    def stop(self):
+        # Get current position
+        position = self.get_current_position()
+
+        # Stop motor
+        command = [0xEC, position[0]]
+        write = i2c_msg.write(self.i2c_address, command)
+        self.bus.i2c_rdwr(write)
+
     def init_limit_switch_forward(self):
         # TX pin
         self.bus.write_byte_data(self.i2c_address, 0x3D, 0x08)
