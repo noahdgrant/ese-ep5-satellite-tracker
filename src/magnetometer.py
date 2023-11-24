@@ -3,7 +3,6 @@
 # Date: November 23, 2023
 
 from math import atan2, degrees
-import board
 import adafruit_lis3mdl
 
 
