@@ -11,13 +11,13 @@ from src.stepper import Stepper
 from time import sleep
 from smbus2 import SMBus
 
+AZ_CHANNEL = 1
 
 def main():
     try:
         # Initialize encoder
         bus = SMBus(11)
-        i2c_address_encoder = 0x36
-        encoder = Encoder(bus, i2c_address_encoder)
+        encoder = Encoder(bus, AZ_CHANNEL)
 
         i2c_address_stepper = 0x0F
         stepper = Stepper(bus, i2c_address_stepper)

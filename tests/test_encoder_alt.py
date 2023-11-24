@@ -5,16 +5,17 @@ from src.encoder import Encoder
 from time import sleep
 from smbus2 import SMBus
 
+ALT_CHANNEL = 0
+
 
 def main():
     # Initialize encoder
     bus = SMBus(11)
-    i2c_address = 0x36
 
-    encoder = Encoder(bus, i2c_address)
+    encoder = Encoder(bus, ALT_CHANNEL)
 
     # Calibration
-    input("Place the sensor in a known orientation (e.g., zero degree position) and press Enter to calibrate.")
+    # input("Place the sensor in a known orientation (e.g., zero degree position) and press Enter to calibrate.")
     encoder.calibrate_zero_degree()
     print("Calibration completed. Script will now run.")
 
