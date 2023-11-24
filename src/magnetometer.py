@@ -19,16 +19,28 @@ class Magnetometer():
         self.bus.write_byte_data(self.i2c_address, set_ccm, 0)
 
     # call repeatedly
-    def read_mag(self, mag_addr):
-        x_raw = self.bus.read_i2c_block_data(mag_addr, self.x_lsb, 2)
-        y_raw = self.bus.read_i2c_block_data(mag_addr, self.y_lsb, 2)
+    def read_mag(self):
+        x_raw = self.bus.read_i2c_block_data(self.i2c_address, self.x_lsb, 2)
+        y_raw = self.bus.read_i2c_block_data(self.i2c_address, self.y_lsb, 2)
 
-        x_l = x_raw >> 8
-        x_h = x_raw & 0xFF00
-        x = x_l % x_h
+        print(x_raw)
+        print(y_raw)
 
-        y_l = y_raw >> 8
-        y_h = y_raw & 0xFF00
-        y = y_l % y_h
+        x_h = x_raw[1] << 8
+        x_l = x_raw[0] & 0xFF00
+        x = x_l | x_h
 
-        return (x, y)
+        y_h = y_raw[1] << 8
+        y_l = y_raw[0] & 0xFF00
+        y = y_l | y_h
+
+        print(x)
+        print(y)
+
+        return self.reading_to_angle(x, y)
+
+    def reading_to_angle(self, x, y):
+        angle = degrees(atan2(y, x))
+        if angle < 0:
+            angle += 360
+        return angle

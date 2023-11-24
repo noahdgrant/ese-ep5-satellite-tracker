@@ -5,13 +5,14 @@
 import sys
 sys.path.append("..")
 
-import board
+from smbus2 import SMBus
 from src.magnetometer import Magnetometer
+from time import sleep
 
 
 def main():
     try:
-        bus = board.I2C()
+        bus = SMBus(1)
         i2c_address = 0x1E
         magnetometer = Magnetometer(bus, i2c_address)
 
@@ -19,8 +20,9 @@ def main():
 
         # Test loop
         while True:
-            reading = magnetometer.get_heading()
+            reading = magnetometer.read_mag()
             print("magnometer is reading: ", reading)
+            sleep(1)
 
         print("Loop finished...")
 
