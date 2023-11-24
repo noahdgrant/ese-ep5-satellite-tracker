@@ -22,7 +22,6 @@ class Encoder:
         return angle_deg
 
     def calibrate_zero_degree(self):
-        input("Rotate the sensor to the zero degree position and press Enter.")
         self.zero_deg_raw_value = (self.bus.read_byte_data(self.AS5600_ADDRESS, self.ANGLE_REGISTER_HIGH) << 8) | self.bus.read_byte_data(self.AS5600_ADDRESS, self.ANGLE_REGISTER_LOW)
 
     def get_adjusted_angle(self):
@@ -31,6 +30,6 @@ class Encoder:
             return None
 
         angle = self.read_angle()
-        adjusted_angle = angle - ((self.zero_deg_raw_value * 360) + 90) / 4096 #this line need to be changed to fit our purpose 
+        adjusted_angle = angle - ((self.zero_deg_raw_value * 360)) / 4096 #this line need to be changed to fit our purpose 
         adjusted_angle %= 360
         return adjusted_angle

@@ -28,11 +28,11 @@ def main():
         print("Encoder angle: %d", angle)
 
         # Test loop
-        stepper.set_target_velocity(3200000)
+        stepper.set_target_velocity(100000000)
         while True:
             angle = encoder.get_adjusted_angle()
-            if 357 < angle < 360:
-                print("Encoder angle: %d", angle)
+            if 0 <= angle < 359.9:
+                print("Encoder angle: ", angle)
             else:
                 break
 
