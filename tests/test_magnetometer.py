@@ -16,10 +16,6 @@ import busio
 
 def main():
     try:
-        bus = board.I2C()
-        i2c_address = 0x1E
-        magnetometer = Magnetometer(bus, i2c_address)
-
         # Initialize encoder
         bus = SMBus(11)
         i2c_address_encoder = 0x36
@@ -27,6 +23,10 @@ def main():
 
         i2c_address_stepper = 0x0F
         stepper = Stepper(bus, i2c_address_stepper)
+        
+        busm = board.I2C()
+        i2c_address = 0x1E
+        magnetometer = Magnetometer(busm, i2c_address)
 
         # Calibration
         encoder.calibrate_zero_degree()
@@ -38,19 +38,19 @@ def main():
         # Test loop
         stepper.set_target_velocity(100000000)
         while True:
-            angle = encoder.get_adjusted_angle()
+            #angle = encoder.get_adjusted_angle()
             reading = magnetometer.get_heading()
-            if 0 <= angle < 359.9:
-                print("Encoder angle: ", angle)
-                print("magnometer is reading: ", reading)
-            else:
+            print("magnometer is reading: ", reading)
+            if 0 <= reading <= 1:
+                #print("Encoder angle: ", angle)
                 break
-
+        
         print("Loop finished...")
         stepper.de_energize()
 
     except KeyboardInterrupt:
         print("Quitting...")
+        stepper.de_energize()
 
 
 if __name__ == "__main__":
