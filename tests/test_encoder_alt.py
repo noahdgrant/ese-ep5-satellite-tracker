@@ -5,6 +5,7 @@ from src.encoder import Encoder
 from time import sleep
 from smbus2 import SMBus
 
+
 def main():
     # Initialize encoder
     bus = SMBus(11)
@@ -20,14 +21,17 @@ def main():
     try:
         while True:
             angle = encoder.get_adjusted_angle()
+            angle1 = encoder.read_angle()
 
             if angle is not None:
                 print(f"Adjusted Angle: {angle:.2f} degrees")
+                print(f"Real Angle: {angle1:.2f} degrees")
 
             sleep(1)
 
     except KeyboardInterrupt:
         print("Script terminated by the user.")
+
 
 if __name__ == "__main__":
     main()
