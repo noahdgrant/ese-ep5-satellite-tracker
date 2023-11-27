@@ -17,10 +17,10 @@ def main():
         antenna.go_home()
 
         # Test setting angles
-        angles = [0, -45, -90, -135, -180]
-        for angle in angles:
-            sleep(5)
-            antenna.set_alt_angle(angle)
+#        angles = [0, -45, -90, -135, -180]
+#        for angle in angles:
+#            sleep(5)
+#            antenna.set_alt_angle(angle)
 
         # Test shutdown sequence
         antenna.shutdown()
