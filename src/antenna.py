@@ -85,16 +85,18 @@ class Antenna():
 
         # Count number of steps in a full rotation
         self.azi_position_min = self.stepper_azi.get_current_position()
+        print("min spot: ", self.azi_position_min)
         self.encoder_azi.calibrate_zero_degree()
         self.stepper_azi.set_target_velocity(10000000)
         while 0 <= self.encoder_azi.get_adjusted_angle() < 359:
-            print("azi angle: ", self.encoder_azi.get_adjusted_angle())
             pass
         #self.stepper_azi.stop() #this does not work
         self.stepper_azi.set_target_velocity(0)
         self.azi_position_max = self.stepper_azi.get_current_position()
+        print("max spot: ", self.azi_position_max)
         self.azi_total_steps = abs(
                 self.azi_position_max - self.azi_position_min)
+        print("total steps ", self.azi_total_steps)        
 
         # Calibrate azimuth encoder
         self.encoder_azi.calibrate_zero_degree()
@@ -104,10 +106,10 @@ class Antenna():
         self.go_azi_home()
 
     def set_alt_angle(self, angle):
-        if angle > self.alt_angle_max:
-            angle = self.alt_angle_max
-        elif angle < self.alt_angle_min:
-            angle = self.alt_angle_min
+        #if angle > self.alt_angle_max:
+        #   angle = self.alt_angle_max
+        #elif angle < self.alt_angle_min:
+        #   angle = self.alt_angle_min
         self.stepper_alt.set_target_position(
                 int(angle / (self.alt_angle_max / abs(self.alt_position_max))))
 
@@ -117,7 +119,7 @@ class Antenna():
         elif angle < self.azi_angle_min:
             angle = self.azi_angle_min
         self.stepper_azi.set_target_position(
-                int(angle / (self.azi_angle_max / self.azi_total_steps)))
+                int((angle / (self.azi_angle_max / self.azi_total_steps)) + self.azi_position_min))
 
     def shutdown(self):
         # Shutdown altitude stepper
