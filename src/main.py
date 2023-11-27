@@ -69,8 +69,17 @@ def main():
             print(f"Time: {observer.date} - Satellite: {satellite_name} - "
                   f"Azimuth: {satellite.az} - Altitude: {satellite.alt}")
 
-            antenna.set_alt_angle(satellite.alt - 90)
-            antenna.set_azi_angle(satellite.az)
+            # Convert TLE data formart to float
+            azi_str = str(satellite.az)
+            azi = azi_str.split(":")
+            azi_deg = float(azi[0] + '.' + azi[1])
+            alt_str = str(satellite.alt)
+            alt = alt_str.split(":")
+            alt_deg = float(alt[0] + '.' + alt[1])
+
+            # Update antenna position
+            antenna.set_alt_angle(alt_deg - 90)
+            antenna.set_azi_angle(azi_deg)
 
             sleep(1)
 
