@@ -2,9 +2,10 @@
 # Author: Noah Grant
 # Date: November 22, 2023
 
-from .stepper import Stepper
-from .magnetometer import Magnetometer
-from .encoder import Encoder
+from stepper import Stepper
+from magnetometer import Magnetometer
+from encoder import Encoder
+
 from smbus2 import SMBus
 from time import sleep
 import board

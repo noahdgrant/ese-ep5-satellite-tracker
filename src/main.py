@@ -4,18 +4,23 @@
 # Author: Noah Grant
 # Date: November 8, 2023
 
+import sys
+sys.path.append("..")
+
 from datetime import datetime
 import ephem
 import geocoder
 import requests
 from time import sleep
 
+from antenna import Antenna
+
 # API links
 TLE_URL = "http://tle.ivanstanojevic.me/api/tle/"
 ELEVATION_URL = "https://api.open-elevation.com/api/v1/lookup?locations="
 
 # Satellite information
-SATELLITE_NUMBER = 25544  # ISS
+SATELLITE_NUMBER = 40075  # ISS
 
 
 def main():
@@ -52,6 +57,9 @@ def main():
 
     print("\nSATELLITE POSITION:")
 
+    antenna = Antenna()
+    antenna.go_home()
+
     while True:
         try:
             # Calculate satellite position
@@ -60,6 +68,9 @@ def main():
 
             print(f"Time: {observer.date} - Satellite: {satellite_name} - "
                   f"Azimuth: {satellite.az} - Altitude: {satellite.alt}")
+
+            antenna.set_alt_angle(satellite.alt - 90)
+            antenna.set_azi_angle(satellite.az)
 
             sleep(1)
 
