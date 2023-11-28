@@ -14,7 +14,7 @@ def main():
     i2c_address = 0x1E
     magnetometer = Magnetometer(bus, i2c_address)
 
-    if input("Do you want to calibrate the magnetometer? [y/n]") == "y":
+    if input("Do you want to calibrate the magnetometer? [y/n] ") == "y":
         magnetometer.calibrate()
 
     while True:

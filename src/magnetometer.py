@@ -80,7 +80,7 @@ class Magnetometer():
               f"z offset = {self.offset_z:6.2f}")
 
     def get_reading(self):
-        data = self.bus.read_i2c_block_data(self.address, REG_OUT_X_L, 6)
+        data = self.bus.read_i2c_block_data(self.i2c_address, REG_OUT_X_L, 6)
         x = data[0] | (data[1] << 8)
         y = data[2] | (data[3] << 8)
         z = data[4] | (data[5] << 8)
