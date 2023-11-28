@@ -42,11 +42,13 @@ def main():
     address = 0x1E
 
     # Initialize LIS3MDL
-    bus.write_byte_data(address, REG_CTRL_REG1, 0x70)  # Set sample rate to 80Hz
+    bus.write_byte_data(address, REG_CTRL_REG1, 0x60)  # Set X and Y to ultra high-performance mode
+    bus.write_byte_data(address, REG_CTRL_REG4, 0x0C)  # Set Z to ultra high-performance mode
+    bus.write_byte_data(address, REG_CTRL_REG1, 0x02)  # Set sample rate to 155Hz
     bus.write_byte_data(address, REG_CTRL_REG2, 0x00)  # Set scale to 4 gauss
     bus.write_byte_data(address, REG_CTRL_REG3, 0x00)  # Set continuous conversion mode
-    bus.write_byte_data(address, REG_CTRL_REG1, 0x60)  # Set X and Y to ultra high performance mode
-    bus.write_byte_data(address, REG_CTRL_REG4, 0x0C)  # Set Z operative mode to high-performance mode
+
+    sleep(0.010)
 
     def calibrate():
         print("Calibrating magnetometer. Please rotate the sensor around all axes...")
@@ -69,9 +71,9 @@ def main():
             sleep(0.01)
 
         # Calculate the middle of the min/max range
-        offset_x = (max_x + min_x) / 2
-        offset_y = (max_y + min_y) / 2
-        offset_z = (max_z + min_z) / 2
+        offset_x = (max_x + min_x) / 2 / 100
+        offset_y = (max_y + min_y) / 2 / 100
+        offset_z = (max_z + min_z) / 2 / 100
 
         print("Calibration done")
         print(f"x offset = {offset_x}, y offset = {offset_y}, z offset = {offset_z}")
@@ -92,18 +94,17 @@ def main():
 
         return (x, y, z)
 
+    def vector_to_degrees(x, y):
+        angle = math.degrees(math.atan2(y, x))
+        if angle < 0:
+            angle += 360
+        return angle
+
     def get_heading():
         x, y, _ = get_reading()
         x -= offset_x
         y -= offset_y
         return vector_to_degrees(x, y)
-
-    def vector_to_degrees(x, y):
-        # Calculate heading
-        angle = math.degrees(math.atan2(y, x))
-        if angle < 360:
-            angle += 360
-        return angle
 
     calibrate()
 
