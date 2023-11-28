@@ -1,10 +1,9 @@
-# Tile: encoder class for satellite tracker
+# Tile: Encoder class for satellite tracker
 # Author: Selman Bursal
 # Date: November 23, 2023
-# Version: 1.0
 
-from smbus2 import SMBus
 import time
+
 
 class Encoder:
     def __init__(self, bus, channel):
@@ -18,23 +17,30 @@ class Encoder:
 
     def read_angle(self):
         self.enable_channel()
-        high_byte = self.bus.read_byte_data(self.AS5600_ADDRESS, self.ANGLE_REGISTER_HIGH)
-        low_byte = self.bus.read_byte_data(self.AS5600_ADDRESS, self.ANGLE_REGISTER_LOW)
+        high_byte = self.bus.read_byte_data(self.AS5600_ADDRESS,
+                                            self.ANGLE_REGISTER_HIGH)
+        low_byte = self.bus.read_byte_data(self.AS5600_ADDRESS,
+                                           self.ANGLE_REGISTER_LOW)
         angle_raw = (high_byte << 8) | low_byte
-        angle_deg = (angle_raw * 360) / 4096 # 2^12 = 4096 this is a 12 bit res
+        angle_deg = (angle_raw * 360) / 4096
         return angle_deg
 
     def calibrate_zero_degree(self):
         self.enable_channel()
-        self.zero_deg_raw_value = (self.bus.read_byte_data(self.AS5600_ADDRESS, self.ANGLE_REGISTER_HIGH) << 8) | self.bus.read_byte_data(self.AS5600_ADDRESS, self.ANGLE_REGISTER_LOW)
+        self.zero_deg_raw_value = (
+                self.bus.read_byte_data((
+                    self.AS5600_ADDRESS, self.ANGLE_REGISTER_HIGH) << 8) |
+                self.bus.read_byte_data(self.AS5600_ADDRESS,
+                                        self.ANGLE_REGISTER_LOW))
 
     def get_adjusted_angle(self):
         if self.zero_deg_raw_value is None:
-            print("Error: Calibration not performed. Call calibrate_zero_degree() first.")
+            print("Error: Calibration not performed." +
+                  "Call calibrate_zero_degree() first.")
             return None
 
         angle = self.read_angle()
-        adjusted_angle = angle - ((self.zero_deg_raw_value * 360)) / 4096 # this line need to be changed to fit our purpose
+        adjusted_angle = angle - ((self.zero_deg_raw_value * 360)) / 4096
         adjusted_angle %= 360
         return adjusted_angle
 
