@@ -68,7 +68,7 @@ class Stepper:
         position = self.get_current_position()
 
         # Stop motor
-        command = [0xEC, position[0]]
+        command = [0xEC, position]
         write = i2c_msg.write(self.i2c_address, command)
         self.bus.i2c_rdwr(write)
 

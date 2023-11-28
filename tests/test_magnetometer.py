@@ -7,27 +7,18 @@ sys.path.append("..")
 
 from smbus2 import SMBus
 from src.magnetometer import Magnetometer
-from time import sleep
 
 
 def main():
-    try:
-        bus = SMBus(1)
-        i2c_address = 0x1E
-        magnetometer = Magnetometer(bus, i2c_address)
+    bus = SMBus(1)
+    i2c_address = 0x1E
+    magnetometer = Magnetometer(bus, i2c_address)
 
-        print("Displaying readings from magnetometer")
+    if input("Do you want to calibrate the magnetometer? [y/n] ") == "y":
+        magnetometer.calibrate()
 
-        # Test loop
-        while True:
-            reading = magnetometer.read_mag()
-            print("magnometer is reading: ", reading)
-            sleep(1)
-
-        print("Loop finished...")
-
-    except KeyboardInterrupt:
-        print("Quitting...")
+    while True:
+        print("Heading: {:.2f} degrees".format(magnetometer.get_heading()))
 
 
 if __name__ == "__main__":

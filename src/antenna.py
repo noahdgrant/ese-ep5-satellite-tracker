@@ -2,9 +2,10 @@
 # Author: Noah Grant
 # Date: November 22, 2023
 
-from .stepper import Stepper
-from .magnetometer import Magnetometer
-from .encoder import Encoder
+from stepper import Stepper
+from magnetometer import Magnetometer
+from encoder import Encoder
+
 from smbus2 import SMBus
 from time import sleep
 import board
@@ -16,12 +17,15 @@ I2C_ADDRESS_MAGNETOMETER = 0x1E
 I2C_ADDRESS_ENCODER_ALT = ...
 I2C_ADDRESS_ENCODER_AZI = 0x36
 
+ALT_CHANNEL = 0
+AZI_CHANNEL = 1
+
 
 class Antenna():
     def __init__(self):
         # Antenna characteristics
-        self.alt_angle_min = 0
-        self.alt_angle_max = 180
+        self.alt_angle_min = -180
+        self.alt_angle_max = 0
         self.alt_position_home = 0
         self.alt_position_min = 0
         self.alt_position_max = 0
@@ -35,10 +39,11 @@ class Antenna():
         # I2C setup
         self.bus = SMBus(11)
         self.bus2 = board.I2C()
-        self.magnetometer = Magnetometer(self.bus2, I2C_ADDRESS_MAGNETOMETER)
+        #self.magnetometer = Magnetometer(self.bus2, I2C_ADDRESS_MAGNETOMETER)
         self.stepper_alt = Stepper(self.bus, I2C_ADDRESS_STEPPER_ALT)
         self.stepper_azi = Stepper(self.bus, I2C_ADDRESS_STEPPER_AZI)
-        self.encoder_azi = Encoder(self.bus, I2C_ADDRESS_STEPPER_AZI)
+        self.encoder_azi = Encoder(self.bus, AZI_CHANNEL)
+        self.encoder_alt = Encoder(self.bus, ALT_CHANNEL)
 
         # Altitude stepper setup
         self.stepper_alt.max_degree = 180
@@ -64,25 +69,28 @@ class Antenna():
                self.stepper_alt.REVERSE_LIMIT_SWITCH) == 0:
             sleep(1)
         self.alt_position_max = self.stepper_alt.get_current_position()
-        self.alt_position_home = self.alt_position_max / 2
+        self.alt_position_home = int(self.alt_position_max / 2)
 
         # Go to midway point
         self.stepper_alt.set_target_position(self.alt_position_home)
+        while (self.stepper_alt.get_current_position() !=
+               self.alt_position_home):
+            sleep(1)
 
     def go_azi_home(self):
         # Go to North
-        self.stepper_azi.set_target_velocity(100000000)
-        while self.magnetometer.get_heading() > 1:
-            pass
-        self.stepper_azi.stop()
+#        self.stepper_azi.set_target_velocity(100000000)
+#        while self.magnetometer.get_heading() > 1:
+#            pass
+#        self.stepper_azi.stop()
 
         # Count number of steps in a full rotation
         self.azi_position_min = self.stepper_azi.get_current_position()
         self.encoder_azi.calibrate_zero_degree()
-        self.stepper_azi.set_target_velocity(100000000)
-        while 0 < self.encoder_azi.get_adjusted_angle() < 359.9:
+        self.stepper_azi.set_target_velocity(10000000)
+        while 0 <= self.encoder_azi.get_adjusted_angle() < 359:
             pass
-        self.stepper_azi.stop()
+        self.stepper_azi.set_target_velocity(0)
         self.azi_position_max = self.stepper_azi.get_current_position()
         self.azi_total_steps = abs(
                 self.azi_position_max - self.azi_position_min)
@@ -91,8 +99,8 @@ class Antenna():
         self.encoder_azi.calibrate_zero_degree()
 
     def go_home(self):
-        self.azi_home()
-        self.alt_home()
+        self.go_alt_home()
+        self.go_azi_home()
 
     def set_alt_angle(self, angle):
         if angle > self.alt_angle_max:
@@ -108,7 +116,8 @@ class Antenna():
         elif angle < self.azi_angle_min:
             angle = self.azi_angle_min
         self.stepper_azi.set_target_position(
-                int(angle / (self.azi_angle_max / self.azi_total_steps)))
+                int((angle / (self.azi_angle_max / self.azi_total_steps))
+                    + self.azi_position_min))
 
     def shutdown(self):
         # Shutdown altitude stepper
