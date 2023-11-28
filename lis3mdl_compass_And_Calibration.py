@@ -12,7 +12,7 @@ from adafruit_lis3mdl import LIS3MDL
 SAMPLE_SIZE = 2000
 
 i2c = busio.I2C(board.SCL, board.SDA)
-magnetometer = LIS3MDL(i2c)
+magnetometer = LIS3MDL(i2c, 0x1e)
 
 while True:
     print("=" * 40)
@@ -71,8 +71,6 @@ while True:
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
-sensor = adafruit_lis3mdl.LIS3MDL(i2c)
-
 
 def vector_2_degrees(x, y):
     angle = degrees(atan2(y, x))
@@ -83,9 +81,11 @@ def vector_2_degrees(x, y):
 
 def get_heading(_sensor):
     magnet_x, magnet_y, _ = _sensor.magnetic
+    magnet_x -= offset_x
+    magnet_y -= offset_y
     return vector_2_degrees(magnet_x, magnet_y)
 
 
 while True:
-    print("heading: {:.2f} degrees".format(get_heading(sensor)))
+    print("heading: {:.2f} degrees".format(get_heading(magnetometer)))
     time.sleep(0.2)

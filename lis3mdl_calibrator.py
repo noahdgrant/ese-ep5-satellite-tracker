@@ -29,7 +29,7 @@ from adafruit_lis3mdl import LIS3MDL
 SAMPLE_SIZE = 2000
 
 i2c = busio.I2C(board.SCL, board.SDA)
-magnetometer = LIS3MDL(i2c)
+magnetometer = LIS3MDL(i2c, 0x1e)
 
 while True:
     print("=" * 40)
