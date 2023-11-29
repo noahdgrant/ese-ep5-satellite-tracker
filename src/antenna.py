@@ -68,7 +68,7 @@ class Antenna():
             sleep(1)
         self.alt_position_max = self.stepper_alt.get_current_position()
         self.alt_position_home = int(self.alt_position_max / 2)
-        self.alt_degree_per_step = (self.alt_angle_max /
+        self.alt_degree_per_step = (abs(self.alt_angle_min) /
                                     abs(self.alt_position_max))
 
         # Go to midway point
@@ -83,6 +83,7 @@ class Antenna():
         while self.magnetometer.get_heading() > 2:
             pass
         self.stepper_azi.set_target_velocity(0)
+        sleep(1)
 
         # Count number of steps in a full rotation
         self.azi_position_min = self.stepper_azi.get_current_position()

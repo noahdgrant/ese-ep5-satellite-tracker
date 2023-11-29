@@ -28,8 +28,8 @@ class Encoder:
     def calibrate_zero_degree(self):
         self.enable_channel()
         self.zero_deg_raw_value = (
-                self.bus.read_byte_data((
-                    self.AS5600_ADDRESS, self.ANGLE_REGISTER_HIGH) << 8) |
+                self.bus.read_byte_data(
+                    self.AS5600_ADDRESS, self.ANGLE_REGISTER_HIGH << 8) |
                 self.bus.read_byte_data(self.AS5600_ADDRESS,
                                         self.ANGLE_REGISTER_LOW))
 
