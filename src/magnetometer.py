@@ -1,6 +1,6 @@
 # Tile: Magnetometer class for satellite tracker
-# Author: Brendan
-# Date: November 23, 2023
+# Author: Noah Grant
+# Date: November 28, 2023
 
 from math import atan2, degrees
 from time import sleep
@@ -79,6 +79,12 @@ class Magnetometer():
               f"y offset = {self.offset_y:6.2f}, " +
               f"z offset = {self.offset_z:6.2f}")
 
+    def get_heading(self):
+        x, y, _ = self.get_reading()
+        x -= self.offset_x
+        y -= self.offset_y
+        return self.vector_to_degrees(x, y)
+
     def get_reading(self):
         data = self.bus.read_i2c_block_data(self.i2c_address, REG_OUT_X_L, 6)
         x = data[0] | (data[1] << 8)
@@ -92,13 +98,7 @@ class Magnetometer():
         return (x, y, z)
 
     def vector_to_degrees(self, x, y):
-        angle = degrees(atan2(y, x))
+        angle = degrees(atan2(x, y))
         if angle < 0:
             angle += 360
         return angle
-
-    def get_heading(self):
-        x, y, _ = self.get_reading()
-        x -= self.offset_x
-        y -= self.offset_y
-        return self.vector_to_degrees(x, y)

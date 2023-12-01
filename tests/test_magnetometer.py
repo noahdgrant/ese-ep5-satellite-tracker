@@ -10,7 +10,7 @@ from src.magnetometer import Magnetometer
 
 
 def main():
-    bus = SMBus(1)
+    bus = SMBus(11)
     i2c_address = 0x1E
     magnetometer = Magnetometer(bus, i2c_address)
 
