@@ -20,6 +20,7 @@ TLE_URL = "http://tle.ivanstanojevic.me/api/tle/"
 ELEVATION_URL = "https://api.open-elevation.com/api/v1/lookup?locations="
 
 # Satellite information
+# ISS: 25544
 SATELLITE_NUMBER = 25544  # ISS
 
 
