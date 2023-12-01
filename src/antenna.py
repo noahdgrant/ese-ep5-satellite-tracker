@@ -87,18 +87,17 @@ class Antenna():
 
         # Count number of steps in a full rotation
         self.azi_position_min = self.stepper_azi.get_current_position()
-        self.encoder_azi.calibrate_zero_degree()
+        self.encoder_azi.postion_north = int(self.encoder_azi.read_angle())
         self.stepper_azi.set_target_velocity(10000000)
-        while 0 <= self.encoder_azi.get_adjusted_angle() < 359:
+        sleep(1)
+        while (int(self.encoder_azi.read_angle()) !=
+               self.encoder_azi.position_north):
             pass
         self.stepper_azi.set_target_velocity(0)
         self.azi_position_max = self.stepper_azi.get_current_position()
         self.azi_total_steps = abs(
                 self.azi_position_max - self.azi_position_min)
         self.azi_degree_per_step = self.azi_angle_max / self.azi_total_steps
-
-        # Calibrate azimuth encoder
-        self.encoder_azi.calibrate_zero_degree()
 
     def go_home(self):
         self.go_alt_home()

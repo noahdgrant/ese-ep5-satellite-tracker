@@ -98,7 +98,7 @@ class Magnetometer():
         return (x, y, z)
 
     def vector_to_degrees(self, x, y):
-        angle = degrees(atan2(y, x))
+        angle = degrees(atan2(x, y))
         if angle < 0:
             angle += 360
         return angle

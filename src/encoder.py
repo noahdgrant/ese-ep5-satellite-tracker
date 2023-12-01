@@ -14,6 +14,7 @@ class Encoder:
         self.bus = bus
         self.zero_deg_raw_value = None
         self.channel = channel
+        self.position_north = 0
 
     def read_angle(self):
         self.enable_channel()

@@ -2,11 +2,12 @@
 
 # Testing mainline for Antenna class
 
+from time import sleep
+
 import sys
 sys.path.append("..")
 
 from src.antenna import Antenna
-from time import sleep
 
 
 def main():
@@ -16,20 +17,20 @@ def main():
         # Test homing antenna
         antenna.go_home()
 
-        # Test setting angles
+        # Test setting altitude angles
         angles = [-45]
         for angle in angles:
             sleep(5)
             antenna.set_alt_angle(angle)
-        
-        # Test setting angles
-        angles = [270,180,45]
+
+        # Test setting azimuth angles
+        angles = [270, 180, 45]
         for angle in angles:
             sleep(8)
             antenna.set_azi_angle(angle)
-        
+
         sleep(30)
-        
+
         # Test shutdown sequence
         antenna.shutdown()
 
