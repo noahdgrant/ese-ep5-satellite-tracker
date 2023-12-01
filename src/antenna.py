@@ -62,7 +62,7 @@ class Antenna():
     def go_azi_home(self):
         # Go to North
         self.stepper_azi.set_target_velocity(10000000)
-        while int(self.magnetometer.get_heading()) != 8:
+        while int(self.magnetometer.get_heading()) != 6:  # 8 is local dependent
             pass
         self.stepper_azi.set_target_velocity(0)
         self.azi_position_min = self.stepper_azi.get_current_position()
