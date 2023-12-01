@@ -7,13 +7,13 @@
 from datetime import datetime
 from time import sleep
 
-import ephem
 import geocoder
 import requests
 
 import sys
 sys.path.append("..")
 from antenna import Antenna
+from tracker import Tracker
 
 # API links
 TLE_URL = "http://tle.ivanstanojevic.me/api/tle/"
@@ -38,48 +38,42 @@ def main():
     print(f"Longitude: {location.latlng[1]}")
     print(f"Elevation: {meters}m")
 
-    # Setup observer
-    observer = ephem.Observer()
-    observer.lat, observer.lon = location.latlng
-
     # TLE info for satellite
     tle = requests.get(f"{TLE_URL}{SATELLITE_NUMBER}").json()
     satellite_name = tle["name"]
     satellite_line1 = tle["line1"]
     satellite_line2 = tle["line2"]
-    satellite = ephem.readtle(satellite_name, satellite_line1,
-                              satellite_line2)
 
     print("\nSATELLITE INFORMATION:")
     print(f"Name: {satellite_name}")
     print(f"TLE line 1: {satellite_line1}")
     print(f"TLE line 2: {satellite_line2}")
 
-    print("\nSATELLITE POSITION:")
+    # Setup tracker
+    tracker = Tracker(
+            location.latlong[0],
+            location.latlong[1],
+            satellite_line1,
+            satellite_line2)
 
     # Setup antenna
     antenna = Antenna()
     antenna.go_home()
 
+    print("\nSATELLITE POSITION:")
+
     # Main control loop
     while True:
         try:
             # Calculate satellite position
-            observer.date = datetime.utcnow()
-            satellite.compute(observer)
+            azimuth, elevation = tracker.satellite_tracker_setpoints()
 
-            print(f"Time: {observer.date} - Satellite: {satellite_name} - "
-                  f"Azimuth: {satellite.az} - Altitude: {satellite.alt}")
-
-            # Convert TLE data formart to float
-            azi_str = str(satellite.az).split(":")
-            azi_deg = float(azi_str[0] + '.' + azi_str[1])
-            alt_str = str(satellite.alt).split(":")
-            alt_deg = float(alt_str[0] + '.' + alt_str[1])
+            print(f"Time: {datetime} - Satellite: {satellite_name} - "
+                  f"Azimuth: {azimuth} - Elevation: {elevation}")
 
             # Update antenna position
-            antenna.set_alt_angle(alt_deg - 90)
-            antenna.set_azi_angle(azi_deg)
+            antenna.set_alt_angle(-1 * elevation)
+            antenna.set_azi_angle(azimuth)
 
             sleep(1)
 
