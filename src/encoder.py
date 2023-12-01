@@ -9,8 +9,8 @@ class Encoder:
     def __init__(self, bus, channel):
         self.AS5600_ADDRESS = 0x36
         self.MUX_ADDRESS = 0x70
-        self.ANGLE_REGISTER_HIGH = 0x0E
-        self.ANGLE_REGISTER_LOW = 0x0F
+        self.ANGLE_REGISTER_HIGH = 0x0C
+        self.ANGLE_REGISTER_LOW = 0x0D
         self.bus = bus
         self.zero_deg_raw_value = None
         self.channel = channel
@@ -23,8 +23,8 @@ class Encoder:
         low_byte = self.bus.read_byte_data(self.AS5600_ADDRESS,
                                            self.ANGLE_REGISTER_LOW)
         angle_raw = (high_byte << 8) | low_byte
-        angle_deg = (angle_raw * 360) / 4096
-        return angle_deg
+        print("inside encoder function: ", angle_raw)
+        return int(angle_raw)
 
     def calibrate_zero_degree(self):
         self.enable_channel()
