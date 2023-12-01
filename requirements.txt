@@ -3,3 +3,5 @@ geocoder
 requests
 smbus2
 RPi.GPIO
+numpy
+sgp4

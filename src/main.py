@@ -51,8 +51,8 @@ def main():
 
     # Setup tracker
     tracker = Tracker(
-            location.latlong[0],
-            location.latlong[1],
+            location.latlng[0],
+            location.latlng[1],
             satellite_line1,
             satellite_line2)
 
@@ -68,7 +68,7 @@ def main():
             # Calculate satellite position
             azimuth, elevation = tracker.satellite_tracker_setpoints()
 
-            print(f"Time: {datetime} - Satellite: {satellite_name} - "
+            print(f"Time: {datetime.now()} - Satellite: {satellite_name} - "
                   f"Azimuth: {azimuth} - Elevation: {elevation}")
 
             # Update antenna position
